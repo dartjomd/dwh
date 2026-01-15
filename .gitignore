@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.env
+
+# Docker & Airflow
+logs/  
+plugins/
+temp/
+*.db
+
+# Data & OS
+/data/
+.DS_Store
+.vscode/

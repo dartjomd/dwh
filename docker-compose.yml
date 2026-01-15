@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: retail_mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} 
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - mysql_data:/var/lib/mysql 
+      - ./sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - retail_network
+
+  elt_core:
+    build: ./elt_core
+    container_name: retail_elt_pipeline
+    environment:
+      DB_HOST: retail_mysql_db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      PYTHONUNBUFFERED: 1 
+    volumes:
+      - ./elt_core:/app:rw 
+      - ./data:/app/data:rw
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - retail_network
+    command: /bin/bash -c "while true; do python3 elt_main.py; sleep 50; done"
+    restart: unless-stopped
+
+  generator:
+    build: ./generator
+    container_name: retail_data_generator
+    volumes:
+      - ./generator:/app:rw
+      - ./data:/app/data:rw
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - retail_network
+    command: /bin/bash -c "while true; do python3 generate_csv.py; sleep 50; done"
+    restart: unless-stopped
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    ports:
+      - "3001:3000"
+    environment:
+      - MB_DB_TYPE=mysql
+      - MB_DB_DBNAME=metabase_db
+      - MB_DB_PORT=3306
+      - MB_DB_USER=${DB_USER}
+      - MB_DB_PASS=${DB_PASSWORD}
+      - MB_DB_HOST=db
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - retail_network
+
+  
+  adminer:
+    image: adminer:latest
+    container_name: retail_adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - retail_network
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+
+networks:
+  retail_network:
+    driver: bridge
