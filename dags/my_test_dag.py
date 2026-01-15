@@ -2,7 +2,6 @@ from airflow import DAG
 from airflow.providers.mysql.operators.mysql import MySqlOperator
 from datetime import datetime, timedelta
 
-# Настройки по умолчанию
 default_args = {
     "owner": "airflow",
     "start_date": datetime(2023, 1, 1),
@@ -10,19 +9,36 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-# Описание самого процесса (DAG)
 with DAG(
-    "check_my_dwh_connection",  # Имя, которое ты увидишь в интерфейсе
+    "ABC-analysis",
     default_args=default_args,
-    schedule_interval=None,  # Запуск только вручную кнопкой
+    schedule_interval=None,
     catchup=False,
+    template_searchpath="/opt/airflow/dags/analytics_sql",
 ) as dag:
-
-    # Задача: просто считаем количество строк в одной из твоих таблиц
-    task_check_db = MySqlOperator(
-        task_id="count_products",
-        mysql_conn_id="mysql_dwh",  # ВАЖНО: это ID, который ты только что сохранил в Admin -> Connections
-        sql="SELECT COUNT(*) FROM dim_product;",  # Замени dim_product на любую свою таблицу
+    # Create data marts and views for all analysis methods
+    prepare_tables_and_views = MySqlOperator(
+        task_id="prepare_tables_and_views",
+        mysql_conn_id="mysql_dwh",
+        sql="prepare_tables_and_views.sql",
+        autocommit=True,
     )
 
-    task_check_db
+    # Run aggregation by category analysis
+    execute_category_sales_analysis = MySqlOperator(
+        task_id="execute_category_sales_analysis",
+        mysql_conn_id="mysql_dwh",
+        sql="info_by_category.sql",
+    )
+
+    # Run abc analysis
+    execute_abc_analysis = MySqlOperator(
+        task_id="run_abc_analysis",
+        mysql_conn_id="mysql_dwh",
+        sql="abc_analysis.sql",
+    )
+
+    prepare_tables_and_views >> [
+        execute_abc_analysis,
+        execute_category_sales_analysis,
+    ]
