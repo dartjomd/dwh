@@ -1,3 +1,4 @@
+REPLACE INTO `customer_retention_rate_analysis` (`total_customers`, `returned`, `percentage`, `load_date`)
 WITH `customer_purchases` AS (
     SELECT
         `c`.`customer_id`,
@@ -8,10 +9,11 @@ WITH `customer_purchases` AS (
 `raw_numbers` AS (
     SELECT 
         COUNT(DISTINCT `c`.`customer_id`) AS `total_customers`,
-        COUNT(DISTINCT CASE WHEN `c`.`purchase_number` = 2 THEN `c`.`customer_id` END) AS `returned`
+        COUNT(DISTINCT CASE WHEN `c`.`purchase_number` >= 2 THEN `c`.`customer_id` END) AS `returned`
     FROM `customer_purchases` AS `c`
 )
 SELECT 
     `n`.*, 
-    (`n`.`returned` * 100.0 / `n`.`total_customers`) AS `percentage` 
+    ROUND((`n`.`returned` * 100.0 / `n`.`total_customers`)) AS `percentage`,
+    '{{ ds }}' AS `load_date`
 FROM `raw_numbers` AS `n`;

@@ -1,4 +1,4 @@
-REPLACE INTO `abc_product_analysis` (`product_id`, `revenue`, `running_share`, `abc_category`, `date`)
+REPLACE INTO `abc_product_analysis` (`product_id`, `revenue`, `running_share`, `abc_category`, `load_date`)
 WITH `products_revenue` AS (
     SELECT 
         `p`.`product_id`,
@@ -23,5 +23,5 @@ SELECT
         WHEN `running_share` <= 0.95 THEN 'B'
         ELSE 'C'
     END AS `abc_category`,
-    '{{ ds }}' AS `date`
+    '{{ ds }}' AS `load_date`
 FROM `calculated_shares`;
