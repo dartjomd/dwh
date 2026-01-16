@@ -10,7 +10,7 @@ default_args = {
 }
 
 with DAG(
-    "ABC-analysis",
+    "data_analytics_dag",
     default_args=default_args,
     schedule_interval=None,
     catchup=False,

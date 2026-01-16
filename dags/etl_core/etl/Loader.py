@@ -1,5 +1,6 @@
 import pandas as pd
-from sqlalchemy import Engine, text
+from sqlalchemy import text
+from sqlalchemy.engine import Engine
 
 
 class Loader:
@@ -10,7 +11,7 @@ class Loader:
     def __init__(self, engine: Engine):
         self.engine = engine
 
-    def create_stage_table(self, df: pd.DataFrame):
+    def fill_stage_table(self, df: pd.DataFrame):
         """Execute SQL query to fill stage table with relevant file data"""
 
         with self.engine.begin() as connection:
