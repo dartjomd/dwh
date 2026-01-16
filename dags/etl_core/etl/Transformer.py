@@ -11,6 +11,7 @@ class Transformer:
         Normalize DataFrame: fill empty cells, normalize column names
 
         :param df: given DataFrame to normalize
+        :filename: filename for csv file from which DataFrame was extracted
         """
 
         # copy DataFrame
@@ -46,5 +47,22 @@ class Transformer:
         df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce")
         df["price"] = df["price"].fillna(0.0)
         df["quantity"] = df["quantity"].fillna(0).astype(int)
+        df["transaction_date"] = (
+            df["transaction_date"].astype(str).str.replace("-", "").str.replace("/", "")
+        )
+
+        # check that transaction date column is in format YYYYMMDD
+        if not df["transaction_date"].str.match(r"^\d{8}$").all():
+            raise ValueError(
+                f"Error: Transaction date is not valid in a file {filename}"
+            )
+
+        # Make sure date is handled correctly
+        df["load_timestamp"] = pd.to_datetime(df["load_timestamp"])
+
+        # check that none of the columns is empty
+        for col in df.columns:
+            if df[col].isna().sum() > 0:
+                raise ValueError(f"Error: Column {col} is empty in a file {filename}")
 
         return df

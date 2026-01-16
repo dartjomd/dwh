@@ -12,8 +12,20 @@ class Extracter:
         try:
             # create DataFrame from csv file
             df = pd.read_csv(filepath_or_buffer=file_path, sep=",")
-
             return df
+
+        # file not found error
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"File {file_path} not found. {e}")
+
+        # empty file error
+        except pd.errors.EmptyDataError as e:
+            raise ValueError(f"File {file_path} is empty. {e}")
+
+        # file is corrupted or wrong format
+        except pd.errors.ParserError as e:
+            raise ValueError(f"File {file_path} is corrupted or format is wrong. {e}")
+
+        # other errors
         except Exception as e:
-            print(f"Error while extracting file {file_path}.")
-            raise Exception(f"File was not processed. {e}")
+            raise Exception(f"File {file_path} was not processed. {e}")
