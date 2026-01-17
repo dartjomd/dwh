@@ -22,7 +22,7 @@ class DB:
     def _create_engine(self, conn_id: str = "mysql_dwh"):
         """Create DB engine by multiple attempts"""
 
-        # Create connection with Airflow connector hooks
+        # get connection with Airflow connector hooks
         connection = BaseHook.get_connection(conn_id)
         db_uri = connection.get_uri()
 
