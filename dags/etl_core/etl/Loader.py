@@ -21,7 +21,7 @@ class Loader:
             # upload DataFrame to stage table
             df.to_sql(
                 name=self.STAGE_TABLE_NAME,
-                con=self.engine,
+                con=connection,
                 if_exists="append",
                 index=False,
             )

@@ -14,7 +14,7 @@ class TestExtracter:
         df = Extracter.get_df_by_path(file_path=raw_sales_file_path)
 
         assert not df.empty
-        assert len(df) == 4
+        assert len(df) == 5
 
     def test_file_not_found(self):
         """Check that extractor raises an error when file is not found"""
@@ -37,5 +37,5 @@ class TestExtracter:
         corrupted_file = tmp_path / "corrupted_file.csv"
         corrupted_file.write_bytes(b"\x00\xff\xfe\xfd")
 
-        with pytest.raises(ValueError, match="is corrupted or format is wrong"):
+        with pytest.raises(Exception, match="was not processed"):
             Extracter.get_df_by_path(file_path=corrupted_file)

@@ -51,6 +51,9 @@ class Transformer:
             df["transaction_date"].astype(str).str.replace("-", "").str.replace("/", "")
         )
 
+        # drop duplicates and keep last incoming record
+        df = df.drop_duplicates(subset=["transaction_id"], keep="last")
+
         # check that transaction date column is in format YYYYMMDD
         if not df["transaction_date"].str.match(r"^\d{8}$").all():
             raise ValueError(

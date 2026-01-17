@@ -3,3 +3,5 @@ sqlalchemy
 mysql-connector-python
 python-dotenv
 pytest
+great_expectations
+apache-airflow-providers-great-expectations

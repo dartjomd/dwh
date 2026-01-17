@@ -6,4 +6,4 @@ import pytest
 def raw_sales_file_path() -> Path:
     """Returns path to test raw sales file"""
     current_dir = Path(__file__).parent
-    return current_dir / "data" / "sample_raw_sales.csv"
+    return current_dir / "tests" / "data" / "sample_raw_sales.csv"

@@ -19,7 +19,9 @@ class TestTransformer:
 
         assert isinstance(normalized_df, pd.DataFrame)
         assert not normalized_df.empty
-        assert len(normalized_df) == 4
+        assert (
+            len(normalized_df) == 4
+        )  # triggers when duplicates are not removed by Transformer
 
         # Define required columns
         required_columns = {
@@ -45,7 +47,7 @@ class TestTransformer:
         assert normalized_df.iloc[0]["quantity"] == 0.0
 
         # Check that there is no empty cells in DataFrame
-        assert normalized_df.isna().sum() == 0
+        assert normalized_df.isna().sum().sum() == 0
 
         # Check that every record is unique
         assert normalized_df["transaction_id"].is_unique
@@ -63,6 +65,7 @@ class TestTransformer:
                 "transaction_id": [1, 2],
                 "transaction_date": ["20230101", "20230102"],
                 "price": ["100", "200"],
+                "customer_id": ["id-1", "id-2"],
                 "quantity": ["1", "2"],
                 "city": [None, None],  # empty column
                 "first_name": ["Mark", "Alex"],
@@ -86,6 +89,7 @@ class TestTransformer:
                 "transaction_id": [1, 2],
                 "transaction_date": ["2023-01-01 00:00:00", "20230102"],
                 "price": ["100", "200"],
+                "customer_id": ["id-1", "id-2"],
                 "quantity": ["1", "2"],
                 "city": ["Helsinki", "London"],
                 "first_name": ["Mark", "Alex"],

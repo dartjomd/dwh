@@ -110,6 +110,7 @@ services:
       - ./data:/opt/airflow/data
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - ./great_expectations:/opt/airflow/great_expectations
     ports:
       - "8080:8080"
     environment:
@@ -134,6 +135,7 @@ services:
       - ./data:/opt/airflow/data
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
+      - ./great_expectations:/opt/airflow/great_expectations
     environment:
       - AIRFLOW_UID=1000
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
