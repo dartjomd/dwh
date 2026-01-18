@@ -84,6 +84,19 @@ fluent_datasources:
   my_mysql_datasource:
     type: sql
     id: fd8ae41f-6602-49fa-8293-888a07b7566f
+    assets:
+      stg_raw_sales_asset:
+        type: query
+        id: 40690626-2b28-4687-8834-a89d0349b4ee
+        batch_metadata: {}
+        batch_definitions:
+          batch_def_stg_raw_sales:
+            id: c112c84e-b799-4398-be12-24c4cf0c2518
+            partitioner:
+              column_name: transaction_date
+              sort_ascending: true
+              method_name: partition_on_year_and_month_and_day
+        query: SELECT * FROM stg_raw_sales
     connection_string: 
       mysql+mysqlconnector://root:your_root_password@db:3306/retail_dwh
 analytics_enabled:

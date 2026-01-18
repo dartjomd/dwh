@@ -189,10 +189,9 @@ class GreatExpectationSetup:
         )
 
         # check that transaction date column is in format YYYYMMDD
-        # if not df["transaction_date"].str.match(r"^\d{8}$").all():
-        #     raise ValueError(
-        #         f"Error: Transaction date is not valid in a file {filename}"
-        #     )
+        validator.expect_column_values_to_match_regex(
+            "transaction_date", regex=r"^\d{4}-\d{2}-\d{2}$"
+        )
 
         # order_date: date mustn't be future
         today = datetime.date.today().strftime("%Y-%m-%d")
@@ -218,3 +217,7 @@ if __name__ == "__main__":
     setup.create_expectation_suite_for_stage_table("stg_raw_sales", "stg_sales_suite")
 
 # dont move failed files in airflow
+# telegram
+# great expectations error logging
+# ci
+# cloud

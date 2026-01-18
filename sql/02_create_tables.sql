@@ -1,3 +1,5 @@
+USE retail_dwh;
+
 CREATE TABLE IF NOT EXISTS `stg_raw_sales` (
     `raw_id` INT AUTO_INCREMENT PRIMARY KEY,
     `transaction_id` VARCHAR(50),
@@ -12,6 +14,23 @@ CREATE TABLE IF NOT EXISTS `stg_raw_sales` (
     `price` DECIMAL(10, 2),
     `quantity` INT,
     `load_timestamp` DATETIME
+);
+
+CREATE TABLE IF NOT EXISTS `failed_sales` (
+    `raw_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `transaction_id` VARCHAR(100),
+    `transaction_date` VARCHAR(100),
+    `customer_id` VARCHAR(100),
+    `first_name` VARCHAR(100),
+    `city` VARCHAR(100),
+    `email` VARCHAR(100),
+    `product_id` VARCHAR(50),
+    `product_name` VARCHAR(255),
+    `product_category` VARCHAR(100),
+    `price`VARCHAR(100),
+    `quantity` VARCHAR(100),
+    `load_timestamp` VARCHAR(100),
+    `rejection_reason` VARCHAR(100)
 );
 
 CREATE TABLE IF NOT EXISTS `dim_customer` (

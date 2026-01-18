@@ -7,12 +7,17 @@ class Loader:
     """Class for handling loading data to database and handling historical updates"""
 
     STAGE_TABLE_NAME = "stg_raw_sales"
+    FAILED_TABLE_NAME = "failed_sales"
 
     def __init__(self, engine: Engine):
         self.engine = engine
 
     def fill_stage_table(self, df: pd.DataFrame):
         """Execute SQL query to fill stage table with relevant file data"""
+
+        # check if DataFrame is empty
+        if df.empty:
+            return
 
         with self.engine.begin() as connection:
             # truncate stage table before processing new file
@@ -21,6 +26,22 @@ class Loader:
             # upload DataFrame to stage table
             df.to_sql(
                 name=self.STAGE_TABLE_NAME,
+                con=connection,
+                if_exists="append",
+                index=False,
+            )
+
+    def upload_failed_records(self, df: pd.DataFrame):
+        """Upload failed records from CSV file to database"""
+
+        # check if DataFrame is empty
+        if df.empty:
+            return
+
+        with self.engine.begin() as connection:
+            # upload DataFrame to stage table
+            df.to_sql(
+                name=self.FAILED_TABLE_NAME,
                 con=connection,
                 if_exists="append",
                 index=False,
