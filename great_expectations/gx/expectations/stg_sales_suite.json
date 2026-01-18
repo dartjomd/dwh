@@ -1,0 +1,9 @@
+{
+  "expectations": [],
+  "id": "a1639146-7970-4add-a3ea-98c8081070d9",
+  "meta": {
+    "great_expectations_version": "1.1.0"
+  },
+  "name": "stg_sales_suite",
+  "notes": null
+}

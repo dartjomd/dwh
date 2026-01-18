@@ -12,6 +12,8 @@ from airflow.providers.mysql.operators.mysql import MySqlOperator
 from airflow.decorators import task
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
+from setup_gx import GreatExpectationSetup
+
 RAW_SALES_BASE_NAME = "raw_sales"
 DATA_DIR = "/opt/airflow/data"
 UNPROCESSED_FILES_DIR = f"{DATA_DIR}/unprocessed"
@@ -96,6 +98,7 @@ with DAG(
         db = DB()
         engine = db.get_engine()
         loader = Loader(engine=engine)
+        gx_tool = GreatExpectationSetup(conn_id="mysql_dwh")
 
         try:
             df = Extracter.get_df_by_path(file_path=file)
@@ -103,6 +106,11 @@ with DAG(
 
             # fill stage table with this csv file data
             loader.fill_stage_table(df=normalized_df)
+
+            # validate data using Great Expectations
+            gx_tool.run_gx_validation(
+                table_name="stg_raw_sales", suite_name="stg_sales_suite"
+            )
 
             # execute SCD2 for products and customers, update fact table
             loader.handle_pipeline(filename=file.name)

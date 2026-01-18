@@ -1,0 +1,80 @@
+{
+  "expectations": [
+    {
+      "kwargs": {
+        "column_set": [
+          "raw_id",
+          "transaction_id",
+          "transaction_date",
+          "customer_id",
+          "first_name",
+          "city",
+          "email",
+          "product_id",
+          "product_name",
+          "product_category",
+          "price",
+          "quantity",
+          "load_timestamp"
+        ]
+      },
+      "meta": {},
+      "type": "expect_table_columns_to_match_set"
+    },
+    {
+      "kwargs": {
+        "column": "email",
+        "regex": "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"
+      },
+      "meta": {},
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "kwargs": {
+        "column": "transaction_id"
+      },
+      "meta": {},
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "kwargs": {
+        "column": "transaction_id"
+      },
+      "meta": {},
+      "type": "expect_column_unique_value_count_to_be_between"
+    },
+    {
+      "kwargs": {
+        "column": "price",
+        "min_value": 0.01
+      },
+      "meta": {
+        "notes": "Price must be positive"
+      },
+      "type": "expect_column_values_to_be_between"
+    },
+    {
+      "kwargs": {
+        "column": "quantity",
+        "max_value": 1000.0,
+        "min_value": 1.0
+      },
+      "meta": {},
+      "type": "expect_column_values_to_be_between"
+    },
+    {
+      "kwargs": {
+        "column": "transaction_date",
+        "max_value": "2026-01-18"
+      },
+      "meta": {},
+      "type": "expect_column_values_to_be_between"
+    }
+  ],
+  "id": "f14f4a0c-06c0-4f66-94ed-d9143d3901f5",
+  "meta": {
+    "great_expectations_version": "1.1.0"
+  },
+  "name": "stg_sales_suite",
+  "notes": null
+}

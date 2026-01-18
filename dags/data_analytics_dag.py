@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta
+
 from airflow import DAG
 from airflow.providers.mysql.operators.mysql import MySqlOperator
-from datetime import datetime, timedelta
 
 default_args = {
     "owner": "airflow",

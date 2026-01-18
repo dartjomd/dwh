@@ -1,2 +1,4 @@
 FROM apache/airflow:2.7.1
-RUN pip install --no-cache-dir apache-airflow-providers-mysql
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir apache-airflow-providers-mysql

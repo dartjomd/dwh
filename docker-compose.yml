@@ -20,7 +20,7 @@ services:
       - retail_network
 
   elt_core:
-    build: ./elt_core
+    build: ./dags/etl_core
     container_name: retail_elt_pipeline
     environment:
       DB_HOST: retail_mysql_db
@@ -29,7 +29,7 @@ services:
       DB_NAME: ${DB_NAME}
       PYTHONUNBUFFERED: 1 
     volumes:
-      - ./elt_core:/app:rw 
+      - ./dags/etl_core:/app:rw 
       - ./data:/app/data:rw
     depends_on:
       db:

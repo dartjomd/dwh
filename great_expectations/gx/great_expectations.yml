@@ -80,11 +80,28 @@ data_docs_sites:
       base_directory: uncommitted/data_docs/local_site/
     site_index_builder:
       class_name: DefaultSiteIndexBuilder
+
+analytics_enabled: true
 fluent_datasources:
   my_mysql_datasource:
     type: sql
-    id: fd8ae41f-6602-49fa-8293-888a07b7566f
+    id: 9d910a60-34f8-45d5-9e8d-d1cc77f61612
+    assets:
+      stg_raw_sales_asset:
+        type: query
+        id: 9c17e01f-bdb1-46cd-a3fa-623b0cc3f993
+        batch_metadata: {}
+        batch_definitions:
+          batch_def_stg_raw_sales:
+            id: 489f42d3-8604-43bf-b37c-b52aa0e3cea4
+            partitioner:
+          batch_def_stg_raw_sales_temp:
+            id: 54d6abcc-5519-44db-a182-2392c697142a
+            partitioner:
+              column_name: transaction_date
+              sort_ascending: true
+              method_name: partition_on_year_and_month_and_day
+        query: SELECT * FROM stg_raw_sales
     connection_string: 
       mysql+mysqlconnector://root:your_root_password@db:3306/retail_dwh
-analytics_enabled:
-data_context_id: 597acd7b-cbe3-4e9e-b290-1b2fa87bd8b3
+data_context_id: 6ce19a48-be83-4db7-a22b-0c4065745b61
