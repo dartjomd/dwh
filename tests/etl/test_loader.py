@@ -63,6 +63,7 @@ class TestLoader:
 
         # mock DataFrame
         df = MagicMock()
+        df.empty = False
 
         # execute method
         mock_loader.fill_stage_table(df)

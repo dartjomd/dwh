@@ -87,11 +87,11 @@ fluent_datasources:
     assets:
       stg_raw_sales_asset:
         type: query
-        id: 6ba23bd5-a47d-43e7-ad6a-8a9d6aa31a9a
+        id: 89f3dcfe-59bd-4858-b5dd-fa12b2c935dd
         batch_metadata: {}
         batch_definitions:
           batch_def_stg_raw_sales:
-            id: 180836d4-f9c5-45de-8107-e2191efc9c38
+            id: 6d337d74-2753-4235-a270-4d462fd006d2
             partitioner:
               column_name: transaction_date
               sort_ascending: true

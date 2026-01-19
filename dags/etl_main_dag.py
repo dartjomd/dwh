@@ -104,9 +104,7 @@ with DAG(
 
         try:
             df = Extracter.get_df_by_path(file_path=file)
-            normalized_df, failed_df = Transformer.normalize_df(
-                df=df, filename=file.name
-            )
+            normalized_df, failed_df = Transformer.normalize_df(df=df)
 
             # upload failed records to database
             loader.upload_failed_records(df=failed_df)

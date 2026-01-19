@@ -7,9 +7,7 @@ class Transformer:
     """Class for normalizing DataFrame with data"""
 
     @staticmethod
-    def normalize_df(
-        df: pd.DataFrame, filename: str
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def normalize_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Normalize DataFrame: fill empty cells, normalize column names
 
@@ -30,7 +28,10 @@ class Transformer:
         # clean DataFrame columns empty cells
         df["price"] = pd.to_numeric(df["price"], errors="coerce")
         df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce")
-        df["transaction_date"] = pd.to_datetime(df["transaction_date"], errors="coerce")
+
+        df["transaction_date"] = pd.to_datetime(
+            df["transaction_date"], format="%Y%m%d", errors="coerce"
+        )
         df["load_timestamp"] = pd.to_datetime(df["load_timestamp"], errors="coerce")
 
         # drop duplicates and keep last incoming record

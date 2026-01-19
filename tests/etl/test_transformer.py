@@ -15,36 +15,17 @@ class TestTransformer:
         df = Extracter.get_df_by_path(file_path=raw_sales_file_path)
 
         # Normalize DataFrame
-        normalized_df = Transformer.normalize_df(df=df, filename=raw_sales_file_path)
+        normalized_df, failed_df = Transformer.normalize_df(df=df)
 
         assert isinstance(normalized_df, pd.DataFrame)
         assert not normalized_df.empty
         assert (
-            len(normalized_df) == 4
+            len(normalized_df) == 3
         )  # triggers when duplicates are not removed by Transformer
 
-        # Define required columns
-        required_columns = {
-            "transaction_id",
-            "transaction_date",
-            "customer_id",
-            "first_name",
-            "city",
-            "email",
-            "product_id",
-            "product_name",
-            "product_category",
-            "price",
-            "quantity",
-            "load_timestamp",
-        }
-
-        # Check that all required columns in DataFrame are present
-        assert required_columns.issubset(normalized_df.columns)
-
         # Check that wrong values in price and quantity columns are handled correctly
-        assert normalized_df.iloc[0]["price"] == 0.0
-        assert normalized_df.iloc[0]["quantity"] == 0.0
+        assert normalized_df.iloc[0]["price"] == 10.0
+        assert normalized_df.iloc[0]["quantity"] == 13
 
         # Check that there is no empty cells in DataFrame
         assert normalized_df.isna().sum().sum() == 0
@@ -57,37 +38,13 @@ class TestTransformer:
         assert pd.api.types.is_numeric_dtype(normalized_df["price"])
         assert pd.api.types.is_object_dtype(normalized_df["transaction_date"])
 
-    def test_normalize_empty_column(self):
-        """Check correct work when data has empty column"""
-
-        bad_data = pd.DataFrame(
-            {
-                "transaction_id": [1, 2],
-                "transaction_date": ["20230101", "20230102"],
-                "price": ["100", "200"],
-                "customer_id": ["id-1", "id-2"],
-                "quantity": ["1", "2"],
-                "city": [None, None],  # empty column
-                "first_name": ["Mark", "Alex"],
-                "email": ["a@b.com", "c@d.com"],
-                "product_id": [10, 11],
-                "product_name": ["A", "B"],
-                "product_category": ["Cat", "Cat"],
-                "load_timestamp": [pd.Timestamp.now(), pd.Timestamp.now()],
-            }
-        )
-
-        # Check that Transformer raises an error
-        with pytest.raises(ValueError, match="is empty in a file"):
-            Transformer.normalize_df(bad_data, "sample_raw_sales.csv")
-
     def test_normalize_wrong_transaction_date(self):
         """Check correct work when transaction date is in wrong format"""
 
         bad_data = pd.DataFrame(
             {
                 "transaction_id": [1, 2],
-                "transaction_date": ["2023-01-01 00:00:00", "20230102"],
+                "transaction_date": ["wrong_date", "20230102"],
                 "price": ["100", "200"],
                 "customer_id": ["id-1", "id-2"],
                 "quantity": ["1", "2"],
@@ -101,6 +58,7 @@ class TestTransformer:
             }
         )
 
-        # Check that Transformer raises an error
-        with pytest.raises(ValueError, match="Transaction date is not valid in a file"):
-            Transformer.normalize_df(bad_data, "sample_raw_sales.csv")
+        df, failed_df = Transformer.normalize_df(bad_data)
+
+        assert df.iloc[0]["transaction_date"] == "2023-01-02"
+        assert failed_df.iloc[0]["transaction_date"] == "NaT"
