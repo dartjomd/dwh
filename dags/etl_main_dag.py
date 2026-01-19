@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List
 from datetime import datetime, timedelta
 
+from utils.TelegramAlert import TelegramAlert
 from etl_core.DB import DB
 from etl_core.etl.Extracter import Extracter
 from etl_core.etl.Transformer import Transformer
@@ -23,8 +24,9 @@ FAILED_FILES_DIR = f"{DATA_DIR}/failed"
 default_args = {
     "owner": "airflow",
     "start_date": datetime(2023, 1, 1),
-    "retries": 1,
+    "retries": 0,
     "retry_delay": timedelta(minutes=5),
+    "on_failure_callback": TelegramAlert.send,
 }
 
 
@@ -123,7 +125,7 @@ with DAG(
             move_csv_file(destination_dir=PROCESSED_FILES_DIR, file_path=file)
         except Exception as e:
             move_csv_file(destination_dir=FAILED_FILES_DIR, file_path=file)
-            raise Exception(f"Fatal error. Skipping {file.name}.")
+            raise Exception(f"Skipping {file.name}. Error: {e}")
 
     # Establish relationship
     files_list = get_files_to_process_task()

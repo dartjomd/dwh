@@ -1,2 +1,5 @@
+apache-airflow-providers-openlineage>=1.8.0
+apache-airflow-providers-telegram
+apache-airflow-providers-mysql
 great-expectations
 mysql-connector-python

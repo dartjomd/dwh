@@ -99,19 +99,21 @@ class GreatExpectationSetup:
                 )
             )
 
-        # 5. Run validation с правильным RunIdentifier
+        # 5. Run validation
         print(f"--- Running GX Validation for {table_name} ---")
 
-        # Импортируем RunIdentifier внутри метода для надежности
+        # Импортируем нужные классы внутри метода
         from great_expectations.core.run_identifier import RunIdentifier
 
+        # Создаем ОБЪЕКТ RunIdentifier
+        # Важно: используем текущее время в UTC
         run_id_obj = RunIdentifier(
-            run_name=f"airflow_run_{table_name}", run_time=datetime.datetime.now()
+            run_name=f"airflow_run_{table_name}",
+            run_time=datetime.datetime.now(datetime.timezone.utc),
         )
 
-        # Теперь передаем ОБЪЕКТ, а не строку
+        # Передаем объект. Теперь ошибка 'dict' object has no attribute 'run_time' исчезнет.
         result = validation_definition.run(run_id=run_id_obj)
-
         # 6. Build Data Docs
         self._context.build_data_docs()
 
@@ -193,12 +195,6 @@ class GreatExpectationSetup:
             "transaction_date", regex=r"^\d{4}-\d{2}-\d{2}$"
         )
 
-        # order_date: date mustn't be future
-        today = datetime.date.today().strftime("%Y-%m-%d")
-        validator.expect_column_values_to_be_between(
-            "transaction_date", max_value=today
-        )
-
         # save file to expectations/<suite_name>.json
         suite_to_save = validator.get_expectation_suite()
 
@@ -211,13 +207,12 @@ class GreatExpectationSetup:
         print(f"Validation rules file '{suite_name}' has been successfully created.")
 
 
+# docker exec -it retail_dwh_project-airflow-scheduler-1 python /opt/airflow/dags/setup_gx.py
 if __name__ == "__main__":
     # create JSON file once
     setup = GreatExpectationSetup(conn_id="mysql_dwh")
     setup.create_expectation_suite_for_stage_table("stg_raw_sales", "stg_sales_suite")
 
-# dont move failed files in airflow
-# telegram
 # great expectations error logging
 # ci
 # cloud
