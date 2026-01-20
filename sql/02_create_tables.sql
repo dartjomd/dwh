@@ -71,3 +71,10 @@ CREATE TABLE IF NOT EXISTS `fact_sales` (
     INDEX `idx_transaction_id` (`transaction_id`)
 );
 
+CREATE TABLE IF NOT EXISTS `etl_stats` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `file_name` VARCHAR(255),
+    `status` ENUM('success', 'failed'),
+    `error_message` TEXT,
+    `processed_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+);

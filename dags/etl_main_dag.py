@@ -3,6 +3,7 @@ from typing import List
 from datetime import datetime, timedelta
 
 from utils.TelegramAlert import TelegramAlert
+from utils.constants import ETLStatusEnum
 from etl_core.DB import DB
 from etl_core.etl.Extracter import Extracter
 from etl_core.etl.Transformer import Transformer
@@ -120,9 +121,22 @@ with DAG(
             # execute SCD2 for products and customers, update fact table
             loader.handle_pipeline(filename=file.name)
 
+            # insert current file process result to etl_stats table
+            loader.insert_etl_stats(
+                filename=file.name, error="", status=ETLStatusEnum.SUCCESS.value
+            )
+
             move_csv_file(destination_dir=PROCESSED_FILES_DIR, file_path=file)
+
         except Exception as e:
+
+            # insert current file process result to etl_stats table
+            loader.insert_etl_stats(
+                filename=file.name, error=str(e), status=ETLStatusEnum.FAILED.value
+            )
+
             move_csv_file(destination_dir=FAILED_FILES_DIR, file_path=file)
+
             raise Exception(f"Skipping {file.name}. Error: {e}")
 
     # Establish relationship

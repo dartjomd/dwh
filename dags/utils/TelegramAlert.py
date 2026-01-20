@@ -1,8 +1,12 @@
 # airflow_ignore_file
 
 # import logging
+from datetime import datetime
 from typing import Dict
 from airflow.providers.telegram.hooks.telegram import TelegramHook
+import pandas as pd
+
+from utils.constants import ETLStatusEnum
 
 
 class TelegramAlert:
@@ -24,21 +28,44 @@ class TelegramAlert:
     def send(context):
         """Callback function to send telegram alert if Great Expectations failed"""
 
-        try:
-            task_info = TelegramAlert._get_task_info(context)
+        task_info = TelegramAlert._get_task_info(context)
 
-            message = (
-                f"❌ <b>Pipeline Failure</b>\n\n"
-                f"<b>DAG:</b> <code>{task_info['dag_id']}</code>\n"
-                f"<b>Task:</b> {task_info['task_id']}\n"
-                f"<b>Error:</b> {str(task_info['exception'])[:200]}...\n\n"
-                f"🔗<b>View Logs</b><code>{task_info['log_url']}</code>"
-            )
+        message = (
+            f"❌ <b>Pipeline Failure</b>\n\n"
+            f"<b>DAG:</b> <code>{task_info['dag_id']}</code>\n"
+            f"<b>Task:</b> {task_info['task_id']}\n"
+            f"<b>Error:</b> {str(task_info['exception'])[:300]}...\n\n"
+            f"🔗<b>View Logs</b><code>{task_info['log_url']}</code>"
+        )
 
-            hook = TelegramHook(telegram_conn_id="telegram_conn_id")
-            hook.send_message({"text": message, "parse_mode": "HTML"})
-            # logging.info("Telegram alert sent successfully.")
+        hook = TelegramHook(telegram_conn_id="telegram_conn_id")
+        hook.send_message({"text": message, "parse_mode": "HTML"})
+        # logging.info("Telegram alert sent successfully.")
 
-        except Exception as e:
-            # logging.error(f"Failed to send Telegram alert: {e}")
-            print(e)
+    @staticmethod
+    def send_etl_report(df: pd.DataFrame):
+        """Function to send daily ETL reports"""
+        print(f"DEBUG: {len(df)}")
+        print(f"DEBUG: {df.to_dict()}")
+        # convert DataFrame to dict
+        data = dict(zip(df["status"], df["total"]))
+
+        # retrieve certain data from dict
+        date_now = datetime.now().strftime("%Y-%m-%d")
+        success_count = data.get(ETLStatusEnum.SUCCESS.value, 0)
+        failed_count = data.get(ETLStatusEnum.FAILED.value, 0)
+        total = success_count + failed_count
+
+        message = (
+            f"📊 <b>ETL Daily Report</b>\n"
+            f"━━━━━━━━━━━━━━━━━━\n"
+            f"📅 Date: <code>{date_now}</code>\n\n"
+            f"✅ <b>Success:</b> {success_count}\n"
+            f"❌ <b>Failed:</b> {failed_count}\n"
+            f"🔹 <b>Total:</b> {total}\n\n"
+            f"{'🚀 Everything is correct!' if failed_count == 0 else '⚠️ ERROR!'}"
+        )
+
+        hook = TelegramHook(telegram_conn_id="telegram_conn_id")
+        hook.send_message({"text": message, "parse_mode": "HTML"})
+        # logging.info("Telegram alert sent successfully.")

@@ -1,8 +1,6 @@
 from pathlib import Path
-import pandas as pd
 import pytest
 
-from dags.etl_core.etl.Transformer import Transformer
 from dags.etl_core.etl.Extracter import Extracter
 
 

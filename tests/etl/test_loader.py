@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock
 
 from dags.etl_core.etl.Loader import Loader
+from dags.utils.constants import ETLStatusEnum, ProcedureNameEnum
 
 
 class TestLoader:
@@ -27,9 +28,13 @@ class TestLoader:
         assert mock_cursor.callproc.call_count == 3
 
         # check that every procedure has been called
-        mock_cursor.callproc.assert_any_call("sp_load_dim_customers")
-        mock_cursor.callproc.assert_any_call("sp_load_dim_products")
-        mock_cursor.callproc.assert_any_call("sp_load_fact_sales")
+        mock_cursor.callproc.assert_any_call(
+            ProcedureNameEnum.SP_LOAD_DIM_CUSTOMERS.value
+        )
+        mock_cursor.callproc.assert_any_call(
+            ProcedureNameEnum.SP_LOAD_DIM_PRODUCTS.value
+        )
+        mock_cursor.callproc.assert_any_call(ProcedureNameEnum.SP_LOAD_FACT_SALES.value)
 
         # check that everything is commited
         mock_conn.commit.assert_called_once()
@@ -77,3 +82,19 @@ class TestLoader:
         df.to_sql.assert_called_once()
         _, kwargs = df.to_sql.call_args
         assert kwargs["con"] == mock_conn
+
+    def test_insert_etl_stats(self, mock_loader):
+        """Test that method correctly inserts ETL statistics"""
+
+        # create mock connection to db
+        mock_conn = mock_loader.engine.begin.return_value.__enter__.return_value
+
+        # execute method
+        mock_loader.insert_etl_stats(
+            filename="test_name.csv", error="error", status=ETLStatusEnum.FAILED.value
+        )
+
+        # check INSERT INTO was called
+        mock_conn.execute.assert_called_once()
+        args, _ = mock_conn.execute.call_args
+        assert "INSERT INTO" in str(args[0])
