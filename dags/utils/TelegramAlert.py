@@ -1,12 +1,15 @@
 # airflow_ignore_file
 
-# import logging
+import logging
 from datetime import datetime
 from typing import Dict
+
 from airflow.providers.telegram.hooks.telegram import TelegramHook
 import pandas as pd
-
 from utils.constants import ETLStatusEnum
+
+# initialize logger
+logger = logging.getLogger(__name__)
 
 
 class TelegramAlert:
@@ -28,8 +31,10 @@ class TelegramAlert:
     def send(context):
         """Callback function to send telegram alert if Great Expectations failed"""
 
+        # retrieve data
         task_info = TelegramAlert._get_task_info(context)
 
+        # form message
         message = (
             f"❌ <b>Pipeline Failure</b>\n\n"
             f"<b>DAG:</b> <code>{task_info['dag_id']}</code>\n"
@@ -38,15 +43,15 @@ class TelegramAlert:
             f"🔗<b>View Logs</b><code>{task_info['log_url']}</code>"
         )
 
+        # send message and log it
         hook = TelegramHook(telegram_conn_id="telegram_conn_id")
         hook.send_message({"text": message, "parse_mode": "HTML"})
-        # logging.info("Telegram alert sent successfully.")
+        logging.info("Telegram pipepine fail report sent successfully.")
 
     @staticmethod
     def send_etl_report(df: pd.DataFrame):
         """Function to send daily ETL reports"""
-        print(f"DEBUG: {len(df)}")
-        print(f"DEBUG: {df.to_dict()}")
+
         # convert DataFrame to dict
         data = dict(zip(df["status"], df["total"]))
 
@@ -56,6 +61,7 @@ class TelegramAlert:
         failed_count = data.get(ETLStatusEnum.FAILED.value, 0)
         total = success_count + failed_count
 
+        # form message
         message = (
             f"📊 <b>ETL Daily Report</b>\n"
             f"━━━━━━━━━━━━━━━━━━\n"
@@ -66,6 +72,7 @@ class TelegramAlert:
             f"{'🚀 Everything is correct!' if failed_count == 0 else '⚠️ ERROR!'}"
         )
 
+        # send message and log it
         hook = TelegramHook(telegram_conn_id="telegram_conn_id")
         hook.send_message({"text": message, "parse_mode": "HTML"})
-        # logging.info("Telegram alert sent successfully.")
+        logging.info("Telegram daily ETL report sent successfully.")

@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 
-from dags.etl_core.etl.Loader import Loader
+from etl_core.etl.Loader import Loader
 from dags.utils.constants import ETLStatusEnum, ProcedureNameEnum
 
 
@@ -71,7 +71,7 @@ class TestLoader:
         df.empty = False
 
         # execute method
-        mock_loader.fill_stage_table(df)
+        mock_loader.fill_stage_table(df, filename="test.csv")
 
         # check TRUNCATE was called
         mock_conn.execute.assert_called_once()

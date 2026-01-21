@@ -19,29 +19,10 @@ services:
     networks:
       - retail_network
 
-  elt_core:
-    build: ./dags/etl_core
-    container_name: retail_elt_pipeline
-    environment:
-      DB_HOST: retail_mysql_db
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      PYTHONUNBUFFERED: 1 
-    volumes:
-      - ./dags/etl_core:/app:rw 
-      - ./data:/app/data:rw
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - retail_network
-    command: /bin/bash -c "while true; do python3 elt_main.py; sleep 50; done"
-    restart: unless-stopped
-
   generator:
     build: ./generator
     container_name: retail_data_generator
+    working_dir: /app
     volumes:
       - ./generator:/app:rw
       - ./data:/app/data:rw
@@ -50,8 +31,10 @@ services:
         condition: service_healthy
     networks:
       - retail_network
-    command: /bin/bash -c "while true; do python3 generate_csv.py; sleep 50; done"
+    command: /bin/bash -c "while true; do python3 -u generate_csv.py; sleep 50; done"
     restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
 
   metabase:
     image: metabase/metabase:latest
@@ -111,6 +94,7 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - ./great_expectations:/opt/airflow/great_expectations
+      - ./etl_core:/opt/airflow/dags/etl_core
     ports:
       - "8080:8080"
     environment:
@@ -136,6 +120,7 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - ./great_expectations:/opt/airflow/great_expectations
+      - ./etl_core:/opt/airflow/dags/etl_core
     environment:
       - AIRFLOW_UID=1000
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow

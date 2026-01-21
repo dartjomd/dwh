@@ -1,8 +1,8 @@
 from pathlib import Path
 import pandas as pd
 
-from dags.etl_core.etl.Transformer import Transformer
-from dags.etl_core.etl.Extracter import Extracter
+from etl_core.etl.Transformer import Transformer
+from etl_core.etl.Extracter import Extracter
 
 
 class TestTransformer:

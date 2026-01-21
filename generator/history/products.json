@@ -1,0 +1,32 @@
+{
+    "PROD-1063": {
+        "product_id": "PROD-1063",
+        "product_name": "Risk Max",
+        "product_category": "Clothing",
+        "price": 80.42
+    },
+    "PROD-1815": {
+        "product_id": "PROD-1815",
+        "product_name": "Early Pro",
+        "product_category": "Electronics",
+        "price": 29.88
+    },
+    "PROD-1333": {
+        "product_id": "PROD-1333",
+        "product_name": "Measure Lite",
+        "product_category": "Electronics",
+        "price": 257.59
+    },
+    "PROD-2729": {
+        "product_id": "PROD-2729",
+        "product_name": "Want Max",
+        "product_category": "Books",
+        "price": 11.3
+    },
+    "PROD-1975": {
+        "product_id": "PROD-1975",
+        "product_name": "Know Lite",
+        "product_category": "Clothing",
+        "price": 351.28
+    }
+}

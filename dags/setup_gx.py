@@ -1,9 +1,14 @@
 # airflow_ignore_file
 
 import datetime
+import logging
 
 import great_expectations as gx
 from airflow.hooks.base import BaseHook
+from great_expectations.core.run_identifier import RunIdentifier
+
+# initialize logger
+logger = logging.getLogger("airflow.task")
 
 
 class GreatExpectationSetup:
@@ -32,7 +37,6 @@ class GreatExpectationSetup:
         datasource_name = "my_mysql_datasource"
         uri = self._get_db_connection_uri()
 
-        # Обновлено: add_or_update_sql для версии 1.x
         datasource = context.data_sources.add_or_update_sql(
             name=datasource_name, connection_string=uri
         )
@@ -59,10 +63,11 @@ class GreatExpectationSetup:
         self, table_name: str, suite_name: str, auto_create_suite: bool = False
     ):
         """Run validation using ValidationDefinition (GX 1.x Native)"""
-        # 1. Get data asset
+
+        # Get data asset
         data_asset = self._get_data_asset(self._datasource, table_name)
 
-        # 2. Get or create Batch Definition
+        # Get or create Batch Definition
         batch_def_name = f"batch_def_{table_name}"
         try:
             batch_definition = data_asset.get_batch_definition(batch_def_name)
@@ -76,7 +81,7 @@ class GreatExpectationSetup:
                     name=batch_def_name, column="transaction_date"
                 )
 
-        # 3. Get Expectation Suite
+        # Get Expectation Suite
         try:
             suite = self._context.suites.get(name=suite_name)
         except (Exception, KeyError):
@@ -86,7 +91,7 @@ class GreatExpectationSetup:
             else:
                 raise Exception(f"Expectation Suite '{suite_name}' not found.")
 
-        # 4. Create or get Validation Definition
+        # Create or get Validation Definition
         val_def_name = f"val_def_{table_name}"
         try:
             validation_definition = self._context.validation_definitions.get(
@@ -99,31 +104,23 @@ class GreatExpectationSetup:
                 )
             )
 
-        # 5. Run validation
-        print(f"--- Running GX Validation for {table_name} ---")
-
-        # Импортируем нужные классы внутри метода
-        from great_expectations.core.run_identifier import RunIdentifier
-
-        # Создаем ОБЪЕКТ RunIdentifier
-        # Важно: используем текущее время в UTC
+        # Create RunIdentifier instance
         run_id_obj = RunIdentifier(
             run_name=f"airflow_run_{table_name}",
             run_time=datetime.datetime.now(datetime.timezone.utc),
         )
 
-        # Передаем объект. Теперь ошибка 'dict' object has no attribute 'run_time' исчезнет.
+        # Validate
         result = validation_definition.run(run_id=run_id_obj)
-        # 6. Build Data Docs
+
+        # Build Data Docs
         self._context.build_data_docs()
 
-        # 7. Check result
+        # Check result
         if not result.success:
-            # Можно добавить логирование количества упавших записей
-            print(f"Validation FAILED for {table_name}")
+            logger.error("Validation FAILED for %s", table_name)
             raise Exception(f"Data Quality validation failed for table: {table_name}")
 
-        print(f"--- Quality Check Passed for {table_name} ---")
         return result.success
 
     def create_expectation_suite_for_stage_table(
@@ -204,7 +201,11 @@ class GreatExpectationSetup:
             pass
 
         self._context.suites.add(suite_to_save)
-        print(f"Validation rules file '{suite_name}' has been successfully created.")
+
+        # log creation info
+        logger.info(
+            "Validation rules file '%s' has been successfully created.", suite_name
+        )
 
 
 # docker exec -it retail_dwh_project-airflow-scheduler-1 python /opt/airflow/dags/setup_gx.py

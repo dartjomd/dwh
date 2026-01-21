@@ -1,6 +1,5 @@
 from typing import Tuple
 import pandas as pd
-from sqlalchemy.engine import Engine
 
 
 class Transformer:

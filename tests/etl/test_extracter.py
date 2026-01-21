@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 
-from dags.etl_core.etl.Extracter import Extracter
+from etl_core.etl.Extracter import Extracter
 
 
 class TestExtracter:

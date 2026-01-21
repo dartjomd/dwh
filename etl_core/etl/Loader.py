@@ -1,7 +1,12 @@
+import logging
+
 import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from utils.constants import ETLStatusEnum, TableNameEnum, ProcedureNameEnum
+
+# initialize logger
+logger = logging.getLogger(__name__)
 
 
 class Loader:
@@ -14,19 +19,29 @@ class Loader:
         """Insert new ETL statistic line"""
 
         # query to insert statistics line
-        query = f"""
+        query = text(
+            f"""
                 INSERT INTO {TableNameEnum.ETL_STATS.value} (file_name, status, error_message)
-                VALUES (%s, %s, %s)
+                VALUES (:filename, :status, :error)
             """
+        )
         # insert statistics line
         with self.engine.begin() as connection:
-            connection.execute(query, (filename, status, error))
+            connection.execute(
+                query,
+                {
+                    "filename": filename,
+                    "status": status,
+                    "error": error,
+                },
+            )
 
-    def fill_stage_table(self, df: pd.DataFrame):
+    def fill_stage_table(self, df: pd.DataFrame, filename: str) -> None:
         """Execute SQL query to fill stage table with relevant file data"""
 
         # check if DataFrame is empty
         if df.empty:
+            logger.info("Skipping %s, empty file.", filename)
             return
 
         with self.engine.begin() as connection:
@@ -41,11 +56,12 @@ class Loader:
                 index=False,
             )
 
-    def upload_failed_records(self, df: pd.DataFrame):
+    def upload_failed_records(self, df: pd.DataFrame, filename: str) -> None:
         """Upload failed records from CSV file to database"""
 
         # check if DataFrame is empty
         if df.empty:
+            logger.info("Skipping %s, empty file.", filename)
             return
 
         with self.engine.begin() as connection:
@@ -74,12 +90,14 @@ class Loader:
 
             # commit if no errors occured
             connection.commit()
-            print(f"[{filename}] has been successfully handled")
+
+            # log info
+            logger.info("File %s has been successfully handled", filename)
 
         except Exception as e:
             # rollback in case of error
             connection.rollback()
-            print(f"Error while handling {filename}: {e}")
+            logger.exception("Error while handling file %s", filename)
             raise e
         finally:
             # always close connection

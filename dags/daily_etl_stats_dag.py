@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 
 from airflow import DAG
 from airflow.providers.mysql.hooks.mysql import MySqlHook
@@ -13,6 +14,9 @@ default_args = {
     "start_date": datetime(2023, 1, 1),
     "retries": 0,
 }
+
+# initialize logger
+logger = logging.getLogger("airflow.task")
 
 
 def get_etl_daily_report() -> pd.DataFrame:
@@ -44,7 +48,7 @@ with DAG("daily_etl_statistics_dag", default_args=default_args, catchup=False) a
             TelegramAlert.send_etl_report(df=df)
 
         except Exception as e:
-            print(e)
+            logger.exception("Unable to send ETL daily report")
             raise Exception(e)
 
     send_etl_daily_report_task()
