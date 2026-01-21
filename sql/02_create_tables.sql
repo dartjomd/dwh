@@ -51,3 +51,4 @@ CREATE TABLE IF NOT EXISTS `fact_sales` (
     FOREIGN KEY (`product_sk`) REFERENCES `dim_product`(`product_sk`) ON DELETE RESTRICT ON UPDATE CASCADE,
     INDEX `idx_transaction_id` (`transaction_id`)
 );
+

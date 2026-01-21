@@ -78,12 +78,68 @@ services:
     container_name: retail_adminer
     restart: always
     ports:
-      - "8080:8080"
+      - "8081:8080"
     networks:
       - retail_network
     depends_on:
       db:
         condition: service_healthy
+
+  postgres-airflow:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - retail_network
+
+  airflow-webserver:
+    build: .
+    command: webserver
+    depends_on:
+      postgres-airflow:
+        condition: service_healthy
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    ports:
+      - "8080:8080"
+    environment:
+      - AIRFLOW_UID=1000
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - _AIRFLOW_DB_UPGRADE=true
+      - _AIRFLOW_WWW_USER_CREATE=true
+      - _AIRFLOW_WWW_USER_USERNAME=admin
+      - _AIRFLOW_WWW_USER_PASSWORD=admin
+    networks:
+      - retail_network
+
+  airflow-scheduler:
+    build: .
+    command: scheduler
+    depends_on:
+      postgres-airflow:
+        condition: service_healthy
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    environment:
+      - AIRFLOW_UID=1000
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    networks:
+      - retail_network
 
 volumes:
   mysql_data:
