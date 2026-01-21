@@ -1,0 +1,9 @@
+TRANSACTION ID,TRANSACTION-DATE,CUSTOMER-ID,FIRST_NAME,CITY,EMAIL,PRODUCT_ID,PRODUCT_NAME,PRODUCT CATEGORY,PRICE,QUANTITY,load_timestamp
+e03c2453,20260116,38728d8f,Vanessa,Port Barbaraton,kblackwell@example.org,PROD-8143,If Pro,Books,Error,,2026-01-16 16:30:32
+4d9925ac,20260116,68729a85,Matthew,New Holly,lukemontes@example.org,PROD-8143,If Pro,Books,10.00,13,2026-01-16 16:30:32
+3a90bf05,20260116,7719d4e3,Tina,Angelaberg,riveravicki@example.org,PROD-3732,Professor Pro,Home Goods,479.7,18,2026-01-16 16:30:32
+c7b311e5,20260116,a56528c7,Jennifer,New Aaron,joshuaneal@example.com,PROD-8143,If Pro,Books,474.36,1,2026-01-16 16:30:32
+c7b311e5,20260116,a56528c7,Jennifer,New Aaron,joshuaneal@example.com,PROD-8143,If Pro,Books,474.36,1,2026-01-16 16:30:32
+
+
+

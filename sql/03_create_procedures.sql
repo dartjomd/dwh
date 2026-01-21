@@ -1,3 +1,5 @@
+USE retail_dwh;
+
 -- 
 -- Procedure for SCD2 for clients
 -- 

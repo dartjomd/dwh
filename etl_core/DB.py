@@ -1,5 +1,5 @@
-import os
 import time
+import logging
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
@@ -12,6 +12,9 @@ from airflow.hooks.base import BaseHook
 MAX_DB_RETRY = 10
 RETRY_DELAY = 10
 
+# initialize logger
+logger = logging.getLogger(__name__)
+
 
 class DB:
     def __init__(self):
@@ -22,13 +25,19 @@ class DB:
     def _create_engine(self, conn_id: str = "mysql_dwh"):
         """Create DB engine by multiple attempts"""
 
-        # Create connection with Airflow connector hooks
+        # get connection with Airflow connector hooks
         connection = BaseHook.get_connection(conn_id)
         db_uri = connection.get_uri()
 
+        # format connection string if needed
+        if db_uri.startswith("mysql://"):
+            db_uri = db_uri.replace("mysql://", "mysql+mysqlconnector://", 1)
+
+        # try to connect to db multiple retries
         for i in range(1, MAX_DB_RETRY + 1):
             try:
-                print(f"Attemp {i} of creating DB engine.")
+                # log info
+                logger.info("Attemp %s of creating DB engine.", i)
 
                 # create engine
                 engine = create_engine(db_uri, echo=False)
@@ -37,28 +46,32 @@ class DB:
                 with engine.connect() as connection:
                     connection.execute(text("SELECT 1 + 1")).fetchone()
 
+                # successful connection
                 self._engine = engine
-                print(
+                logger.info(
                     "Test request has been successfuly executed. DB engine has been created."
                 )
                 break
             except (OperationalError, InterfaceError, DatabaseError) as e:
                 if i < MAX_DB_RETRY:
-                    print(f"Connection error, will retry in {RETRY_DELAY} seconds.")
+                    logger.exception(
+                        "Connection error, will retry in %s seconds.", RETRY_DELAY
+                    )
                     time.sleep(RETRY_DELAY)
                 else:
-                    print(
+                    logger.exception(
                         "FATAL: Fail to connect to db. This was last attemp to create DB engine."
                     )
                     raise ConnectionError(
                         "Failed to connect to database after all retries"
                     )
             except Exception as e:
-                print(f"An unexpected error occurred during engine creation: {e}")
+                logger.exception("An unexpected error occurred during engine creation")
                 raise ConnectionError("Failed to connect to database after all retries")
 
     def get_engine(self) -> Engine:
         """Get engine"""
+
         if not self._engine:
             raise RuntimeError("Engine is not initialized.")
         return self._engine

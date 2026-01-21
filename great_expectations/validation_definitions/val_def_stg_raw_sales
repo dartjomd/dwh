@@ -1,0 +1,22 @@
+{
+  "data": {
+    "asset": {
+      "id": "72bc8f8c-1e06-4b78-8c1e-70bc3bddfcb0",
+      "name": "stg_raw_sales_asset"
+    },
+    "batch_definition": {
+      "id": "97f41324-edf6-40f5-b0e9-43edaa4623fe",
+      "name": "batch_def_stg_raw_sales"
+    },
+    "datasource": {
+      "id": "fd8ae41f-6602-49fa-8293-888a07b7566f",
+      "name": "my_mysql_datasource"
+    }
+  },
+  "id": "fd963e26-78ec-4e11-83f7-a7860cb4d456",
+  "name": "val_def_stg_raw_sales",
+  "suite": {
+    "id": "f14f4a0c-06c0-4f66-94ed-d9143d3901f5",
+    "name": "stg_sales_suite"
+  }
+}

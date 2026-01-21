@@ -1,22 +1,21 @@
 import os
 from pathlib import Path
+import sys
 import pandas as pd
 from faker import Faker
 import random
 from datetime import datetime
 import uuid
 import json
+import logging
 
 fake = Faker("en_US")
 
 # --- PROJECT ROOT DEFINITION AND ABSOLUTE PATHS ---
 
-# 1. Locate the directory where this script resides (generator/)
-SCRIPT_DIR = Path(__file__).resolve().parent
-
-# 2. Go one level up to reach the project root (RETAIL_DWH_PROJECT)
+# Go one level up to reach the project root (RETAIL_DWH_PROJECT)
 # This ensures folders are created relative to the root, regardless of where the script is executed.
-PROJECT_ROOT = SCRIPT_DIR.parent
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 # --- ABSOLUTE PATHS ---
 # Using PROJECT_ROOT for all file operations
@@ -24,7 +23,7 @@ HISTORY_DIR = PROJECT_ROOT / "history"
 CUSTOMER_HISTORY_FILE = HISTORY_DIR / "customers.json"
 PRODUCT_HISTORY_FILE = HISTORY_DIR / "products.json"
 
-OUTPUT_DIR = "data/unprocessed"
+OUTPUT_DIR = PROJECT_ROOT / "data/unprocessed"
 
 # --- Global Constants and Variables ---
 N_RECORDS = 50
@@ -32,6 +31,16 @@ N_RECORDS = 50
 # Global variables store DICTs instead of LISTs for efficient access and updates by ID
 EXISTING_CUSTOMERS: dict[str, dict] = {}
 EXISTING_PRODUCTS: dict[str, dict] = {}
+
+# configure logger so docker can show them
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
+)
+
+# initialize logger
+logger = logging.getLogger(__name__)
 
 
 # --- HISTORY FUNCTIONS ---
@@ -73,7 +82,7 @@ def load_or_initialize_history(file_path: Path) -> dict:
         json_string = file_path.read_text(encoding="utf-8")
         return json.loads(json_string) if json_string.strip() else {}
     except (json.JSONDecodeError, FileNotFoundError, Exception) as e:
-        print(f"Error loading or decoding {file_path.name}: {e}. Data reset.")
+        logger.exception("Error loading or decoding %s", file_path.name)
         return {}
 
 
@@ -86,11 +95,16 @@ def update_history_file(file_path: Path, new_data: dict):
         file_path.parent.mkdir(parents=True, exist_ok=True)
         json_string = json.dumps(existing_data, indent=4, ensure_ascii=False)
         file_path.write_text(json_string, encoding="utf-8")
-        print(
-            f"Successfully updated and saved {len(existing_data)} records to {file_path.name}."
+
+        # log success
+        logger.info(
+            "Successfully updated and saved %s records to %s.",
+            len(existing_data),
+            file_path.name,
         )
     except Exception as e:
-        print(f"FATAL: Failed to write to {file_path.name}. Error: {e}")
+        # log error
+        logger.exception("FATAL: Failed to write to %s", file_path.name)
 
 
 def initialize_history(n_customers: int = 10, n_products: int = 5):
@@ -116,8 +130,11 @@ def initialize_history(n_customers: int = 10, n_products: int = 5):
         update_history_file(PRODUCT_HISTORY_FILE, new_products_dict)
         EXISTING_PRODUCTS = new_products_dict
 
-    print(
-        f"History initialized: {len(EXISTING_CUSTOMERS)} clients, {len(EXISTING_PRODUCTS)} products."
+    # log success
+    logger.info(
+        "History initialized: %s clients, %s products.",
+        len(EXISTING_CUSTOMERS),
+        len(EXISTING_PRODUCTS),
     )
 
 
@@ -150,8 +167,11 @@ def _imitate_customer_change(probability: float, customer_id: str):
             customer["email"] = fake.email()
             change_field = "email"
 
-        print(
-            f"[{datetime.now().strftime('%H:%M:%S')}] SCD TRIGGERED: Customer {customer_id} changed {change_field}."
+        logger.info(
+            "[%s] SCD TRIGGERED: Customer %s changed %s.",
+            datetime.now().strftime("%H:%M:%S"),
+            customer_id,
+            change_field,
         )
         update_history_file(CUSTOMER_HISTORY_FILE, {customer_id: customer})
 
@@ -161,8 +181,11 @@ def _imitate_product_change(probability: float, product_id: str):
     product = EXISTING_PRODUCTS[product_id]
     if random.random() < probability:
         product["price"] = round(random.uniform(10.0, 500.0), 2)
-        print(
-            f"[{datetime.now().strftime('%H:%M:%S')}] SCD TRIGGERED: Product {product_id} changed price to {product['price']}."
+        logger.info(
+            "[%s] SCD TRIGGERED: Product %s changed price to %s.",
+            datetime.now().strftime("%H:%M:%S"),
+            product_id,
+            product["price"],
         )
         update_history_file(PRODUCT_HISTORY_FILE, {product_id: product})
 
@@ -211,17 +234,22 @@ def generate_sales_data(num_records: int) -> pd.DataFrame:
 
 # Main execution block
 if __name__ == "__main__":
+    print("GENERATOR STARTING...")
     # Create output directory using absolute path
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     df_sales = generate_sales_data(N_RECORDS)
-
     date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     # Construct final filename using the output directory path
-    filename = os.path.join(OUTPUT_DIR, f"raw_sales_{date}.csv")
+    filename = OUTPUT_DIR / f"raw_sales_{date}.csv"
 
     df_sales.to_csv(filename, index=False, header=True)
-    print(
-        f"[{datetime.now().strftime('%H:%M:%S')}] Generated {N_RECORDS} records to {filename}"
+
+    # log successful file generation
+    logger.info(
+        "[%s] Generated %s records to %s",
+        datetime.now().strftime("%H:%M:%S"),
+        N_RECORDS,
+        filename,
     )
