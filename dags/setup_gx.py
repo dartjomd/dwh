@@ -9,13 +9,12 @@ import great_expectations as gx
 
 from airflow.hooks.base import BaseHook
 
-from great_expectations.datasource.fluent.interfaces import Datasource, DataAsset
 from great_expectations.core.batch_definition import BatchDefinition
 from great_expectations.core.expectation_suite import ExpectationSuite
-from great_expectations.data_context import AbstractDataContext
-from great_expectations.validation_definition import ValidationDefinition
-
+from great_expectations.core.validation_definition import ValidationDefinition
 from great_expectations.core.run_identifier import RunIdentifier
+from great_expectations.datasource.fluent.interfaces import Datasource, DataAsset
+from great_expectations.data_context import AbstractDataContext
 
 # initialize logger
 logger = logging.getLogger("airflow.task")
