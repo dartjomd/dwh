@@ -62,6 +62,4 @@ class TestTransformer:
         df, failed_df = Transformer.normalize_df(bad_data)
 
         assert df.iloc[0]["transaction_date"] == "2023-01-02"
-
-        assert pd.isna(failed_df.iloc[0]["transaction_date"])
-        # assert failed_df.iloc[0]["transaction_date"] == "NaT"
+        assert failed_df.iloc[0]["transaction_date"] == "NaT"
