@@ -5,4 +5,4 @@ pandas
 sqlalchemy
 mysql-connector-python
 python-dotenv
-great-expectations
+great-expectations==0.18.12
