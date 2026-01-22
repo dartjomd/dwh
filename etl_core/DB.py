@@ -52,9 +52,9 @@ class DB:
                     "Test request has been successfuly executed. DB engine has been created."
                 )
                 break
-            except (OperationalError, InterfaceError, DatabaseError) as e:
+            except (OperationalError, InterfaceError, DatabaseError):
                 if i < MAX_DB_RETRY:
-                    logger.exception(
+                    logger.warning(
                         "Connection error, will retry in %s seconds.", RETRY_DELAY
                     )
                     time.sleep(RETRY_DELAY)
@@ -65,9 +65,9 @@ class DB:
                     raise ConnectionError(
                         "Failed to connect to database after all retries"
                     )
-            except Exception as e:
+            except Exception:
                 logger.exception("An unexpected error occurred during engine creation")
-                raise ConnectionError("Failed to connect to database after all retries")
+                raise
 
     def get_engine(self) -> Engine:
         """Get engine"""

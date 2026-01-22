@@ -80,8 +80,8 @@ def move_csv_file(destination_dir: str, file_path: Path):
         file_path.replace(destination_path)
     except FileNotFoundError:
         logger.exception("Error. Source file %s doesn't exist", file_path.name)
-    except Exception as e:
-        logger.exception("Unexpected error: %s", e)
+    except Exception:
+        logger.exception("Unexpected error")
 
 
 with DAG(

@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import sys
 import pandas as pd
@@ -81,7 +80,7 @@ def load_or_initialize_history(file_path: Path) -> dict:
     try:
         json_string = file_path.read_text(encoding="utf-8")
         return json.loads(json_string) if json_string.strip() else {}
-    except (json.JSONDecodeError, FileNotFoundError, Exception) as e:
+    except (json.JSONDecodeError, FileNotFoundError, Exception):
         logger.exception("Error loading or decoding %s", file_path.name)
         return {}
 
@@ -102,7 +101,7 @@ def update_history_file(file_path: Path, new_data: dict):
             len(existing_data),
             file_path.name,
         )
-    except Exception as e:
+    except Exception:
         # log error
         logger.exception("FATAL: Failed to write to %s", file_path.name)
 
