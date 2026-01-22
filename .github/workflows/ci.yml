@@ -86,4 +86,4 @@ jobs:
         env:
           AIRFLOW_CONN_MYSQL_DWH: "mysql://root:root@127.0.0.1:3306/retail_dwh"
         run: |
-          python setup_gx.py
+          python ./dags/setup_gx.py
