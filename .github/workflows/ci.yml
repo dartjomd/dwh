@@ -78,7 +78,7 @@ jobs:
 
       - name: Initialize Database Schema
         run: |
-          mysql -h 127.0.0.1 -u root -proot retail_dwh < ./sql/01_create_db.sql
+          mysql -h 127.0.0.1 -u root -proot < ./sql/01_create_db.sql
           mysql -h 127.0.0.1 -u root -proot retail_dwh < ./sql/02_create_tables.sql
           mysql -h 127.0.0.1 -u root -proot retail_dwh < ./sql/03_create_procedures.sql
 
