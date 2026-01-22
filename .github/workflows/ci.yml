@@ -9,34 +9,34 @@ on:
 jobs:
 
   # linting test
-  # linting:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: '3.9'
-  #         cache: 'pip'
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install flake8
-  #     - name: Run flake8
-  #       run: flake8 .
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+      - name: Run flake8
+        run: flake8 .
 
-  # # docker work test
-  # build:
-  #   needs: linting
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Build Airflow Image
-  #       run: docker build -t retail-airflow:test .
-  #     - name: Build Generator Image
-  #       run: docker build -t retail-generator:test ./generator
+  # docker work test
+  build:
+    needs: linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build Airflow Image
+        run: docker build -t retail-airflow:test .
+      - name: Build Generator Image
+        run: docker build -t retail-generator:test ./generator
 
   # Great Expectations test
   data-quality:
