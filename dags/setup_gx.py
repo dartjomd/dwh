@@ -7,7 +7,7 @@ from typing import Any, Tuple
 # Основной модуль
 import great_expectations as gx
 
-from airflow.hooks.base_hook import BaseHook
+from airflow.hooks.base import BaseHook
 
 from great_expectations.datasource.fluent.interfaces import Datasource, DataAsset
 from great_expectations.core.batch_definition import BatchDefinition
