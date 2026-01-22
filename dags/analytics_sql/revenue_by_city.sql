@@ -1,4 +1,4 @@
-REPLACE INTO `revenue_by_city_analysis` (`city`, `category`, `revenue`, `load_date`)
+INSERT INTO `revenue_by_city_analysis` (`city`, `category`, `revenue`, `load_date`)
 WITH `sales` AS (
     SELECT 
         `c`.`city`, 

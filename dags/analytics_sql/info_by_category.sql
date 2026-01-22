@@ -1,4 +1,4 @@
-REPLACE INTO `category_sales_analysis` (`category`, `total_revenue`, `total_quantity`, `load_date`)
+INSERT INTO `category_sales_analysis` (`category`, `total_revenue`, `total_quantity`, `load_date`)
 SELECT 
     `p`.`category`, 
     SUM(`s`.`amount`) AS `total_revenue`, 

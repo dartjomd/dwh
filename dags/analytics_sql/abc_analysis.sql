@@ -1,4 +1,4 @@
-REPLACE INTO `abc_product_analysis` (`product_id`, `revenue`, `running_share`, `abc_category`, `load_date`)
+INSERT INTO `abc_product_analysis` (`product_id`, `revenue`, `running_share`, `abc_category`, `load_date`)
 WITH `products_revenue` AS (
     SELECT 
         `p`.`product_id`,

@@ -1,4 +1,4 @@
-REPLACE INTO `price_elasticity_analysis` (`name`, `price`, `is_current`, `total_sold`, `days_on_sale`, `sales_per_day`, `price_start`, `price_end`, `load_date`)
+INSERT INTO `price_elasticity_analysis` (`name`, `price`, `is_current`, `total_sold`, `days_on_sale`, `sales_per_day`, `price_start`, `price_end`, `load_date`)
 WITH `product_prices` AS (
     SELECT 
         `product_id`,
