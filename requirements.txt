@@ -1,8 +1,9 @@
+apache-airflow-providers-mysql==6.4.1
+apache-airflow-providers-telegram 
 apache-airflow-providers-openlineage>=1.8.0
-apache-airflow-providers-telegram
-apache-airflow-providers-mysql
-pandas
-sqlalchemy
-mysql-connector-python
-python-dotenv
-great-expectations==0.18.12
+pandas==2.3.3
+SQLAlchemy==2.0.44
+mysql-connector-python==9.5.0
+python-dotenv==1.2.1
+
+great-expectations==1.11.0
