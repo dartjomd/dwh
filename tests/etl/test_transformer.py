@@ -35,7 +35,9 @@ class TestTransformer:
         # Check that column types are correct
         assert pd.api.types.is_datetime64_any_dtype(normalized_df["load_timestamp"])
         assert pd.api.types.is_numeric_dtype(normalized_df["price"])
-        assert pd.api.types.is_object_dtype(normalized_df["transaction_date"])
+
+        assert pd.api.types.is_string_dtype(normalized_df["transaction_date"])
+        # assert pd.api.types.is_object_dtype(normalized_df["transaction_date"])
 
     def test_normalize_wrong_transaction_date(self):
         """Check correct work when transaction date is in wrong format"""
@@ -60,4 +62,6 @@ class TestTransformer:
         df, failed_df = Transformer.normalize_df(bad_data)
 
         assert df.iloc[0]["transaction_date"] == "2023-01-02"
-        assert failed_df.iloc[0]["transaction_date"] == "NaT"
+
+        assert pd.isna(failed_df.iloc[0]["transaction_date"])
+        # assert failed_df.iloc[0]["transaction_date"] == "NaT"
