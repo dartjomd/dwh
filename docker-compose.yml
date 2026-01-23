@@ -114,7 +114,9 @@ services:
       - _AIRFLOW_WWW_USER_USERNAME=admin
       - _AIRFLOW_WWW_USER_PASSWORD=admin
       - AIRFLOW_CONN_MYSQL_DWH=mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}
-      - AIRFLOW_CONN_TELEGRAM_DEFAULT=http://:${TELEGRAM_BOT_API_KEY}@https%3A%2F%2Fapi.telegram.org?chat_id=${TELEGRAM_BOT_CHAT_ID}
+      - TELEGRAM_BOT_CHAT_ID=${TELEGRAM_BOT_CHAT_ID}
+      - TELEGRAM_BOT_API_KEY=${TELEGRAM_BOT_API_KEY}
+      - AIRFLOW_CONN_TELEGRAM_CONN_ID=telegram://:${TELEGRAM_BOT_API_KEY}@default
     networks:
       - retail_network
 
@@ -136,7 +138,9 @@ services:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW_CONN_MYSQL_DWH=mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}
-      - AIRFLOW_CONN_TELEGRAM_DEFAULT=http://:${TELEGRAM_BOT_API_KEY}@https%3A%2F%2Fapi.telegram.org?chat_id=${TELEGRAM_BOT_CHAT_ID}
+      - TELEGRAM_BOT_CHAT_ID=${TELEGRAM_BOT_CHAT_ID}
+      - TELEGRAM_BOT_API_KEY=${TELEGRAM_BOT_API_KEY}
+      - AIRFLOW_CONN_TELEGRAM_CONN_ID=telegram://:${TELEGRAM_BOT_API_KEY}@default
     networks:
       - retail_network
 

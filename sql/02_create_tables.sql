@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS `stg_raw_sales` (
     `product_id` VARCHAR(50),
     `product_name` VARCHAR(255),
     `product_category` VARCHAR(100),
-    `price` DECIMAL(10, 2) CHECK(`price` >= 0.01),
-    `quantity` INT CHECK(`quantity` BETWEEN 1 AND 1000),
+    `price` DECIMAL(10, 2),
+    `quantity` INT,
     `load_timestamp` DATETIME
 );
 

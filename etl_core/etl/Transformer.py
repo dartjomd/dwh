@@ -62,4 +62,7 @@ class Transformer:
         # change date type after all potential error records have been dropped
         df["transaction_date"] = df["transaction_date"].dt.strftime("%Y-%m-%d")
 
+        # quantity as int
+        df["quantity"] = df["quantity"].astype(int)
+
         return df, failed_df

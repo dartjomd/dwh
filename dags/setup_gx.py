@@ -164,7 +164,9 @@ class GreatExpectationSetup:
 
         # Check result
         if not result.success:
-            logger.error("Validation FAILED for %s", table_name)
+            logger.error(
+                "Validation FAILED for %s, Explanation: %s", table_name, result
+            )
             raise Exception(f"Data Quality validation failed for table: {table_name}")
 
         return bool(result.success)

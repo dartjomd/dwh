@@ -1,4 +1,4 @@
-INSERT INTO `customer_retention_rate_analysis` (`total_customers`, `returned`, `percentage`, `load_date`)
+REPLACE INTO `customer_retention_rate_analysis` (`total_customers`, `returned`, `percentage`, `load_date`)
 WITH `customer_purchases` AS (
     SELECT
         `c`.`customer_id`,

@@ -17,3 +17,5 @@ temp/
 /data/
 .DS_Store
 .vscode/
+/history/
+/generator/history
