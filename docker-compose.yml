@@ -68,6 +68,14 @@ services:
       db:
         condition: service_healthy
 
+  fix-permissions:
+    image: alpine
+    user: "0:0"
+    volumes:
+      - .:/opt/airflow
+    command: >
+      sh -c "chmod -R 777 /opt/airflow && chown -R 50000:0 /opt/airflow"
+
   postgres-airflow:
     image: postgres:13
     environment:
@@ -105,6 +113,8 @@ services:
       - _AIRFLOW_WWW_USER_CREATE=true
       - _AIRFLOW_WWW_USER_USERNAME=admin
       - _AIRFLOW_WWW_USER_PASSWORD=admin
+      - AIRFLOW_CONN_MYSQL_DWH=mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}
+      - AIRFLOW_CONN_TELEGRAM_DEFAULT=http://:${TELEGRAM_BOT_API_KEY}@https%3A%2F%2Fapi.telegram.org?chat_id=${TELEGRAM_BOT_CHAT_ID}
     networks:
       - retail_network
 
@@ -125,6 +135,8 @@ services:
       - AIRFLOW_UID=1000
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW_CONN_MYSQL_DWH=mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}
+      - AIRFLOW_CONN_TELEGRAM_DEFAULT=http://:${TELEGRAM_BOT_API_KEY}@https%3A%2F%2Fapi.telegram.org?chat_id=${TELEGRAM_BOT_CHAT_ID}
     networks:
       - retail_network
 

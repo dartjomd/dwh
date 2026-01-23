@@ -70,7 +70,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements-dev.txt
+          pip install -r requirements/ci.txt
 
       - name: Run Unit Tests (pytest)
         run: |

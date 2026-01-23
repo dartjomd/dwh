@@ -12,5 +12,6 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 USER airflow
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+COPY requirements/local.txt ./local.txt
+RUN pip install --no-cache-dir -r local.txt
