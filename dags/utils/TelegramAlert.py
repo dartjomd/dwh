@@ -1,5 +1,6 @@
 # airflow_ignore_file
 
+import os
 import logging
 from datetime import datetime
 from typing import Dict
@@ -44,7 +45,8 @@ class TelegramAlert:
         )
 
         # send message and log it
-        hook = TelegramHook(telegram_conn_id="telegram_conn_id")
+        chat_id = os.getenv("TELEGRAM_BOT_CHAT_ID")
+        hook = TelegramHook(telegram_conn_id="telegram_conn_id", chat_id=chat_id)
         hook.send_message({"text": message, "parse_mode": "HTML"})
         logging.info("Telegram pipepine fail report sent successfully.")
 
@@ -73,6 +75,7 @@ class TelegramAlert:
         )
 
         # send message and log it
-        hook = TelegramHook(telegram_conn_id="telegram_conn_id")
+        chat_id = os.getenv("TELEGRAM_BOT_CHAT_ID")
+        hook = TelegramHook(telegram_conn_id="telegram_conn_id", chat_id=chat_id)
         hook.send_message({"text": message, "parse_mode": "HTML"})
         logging.info("Telegram daily ETL report sent successfully.")

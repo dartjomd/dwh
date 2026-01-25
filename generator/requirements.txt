@@ -1,2 +1,4 @@
-pandas
-faker
+Faker==38.2.0
+pandas==2.3.3
+mysql-connector-python==9.5.0
+python-dotenv==1.2.1

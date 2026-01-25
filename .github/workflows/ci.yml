@@ -1,0 +1,89 @@
+name: Retail DWH CI
+
+on:
+  push:
+    branches: [ main, master, ci ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  # linting test
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+      - name: Run flake8
+        run: flake8 .
+
+  # docker work test
+  build:
+    needs: linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build Airflow Image
+        run: docker build -t retail-airflow:test .
+      - name: Build Generator Image
+        run: docker build -t retail-generator:test ./generator
+
+  # Great Expectations test
+  data-quality:
+    needs: build
+    runs-on: ubuntu-latest
+
+    # setup MySQL    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: retail_dwh
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements/ci.txt
+
+      - name: Run Unit Tests (pytest)
+        run: |
+          pytest tests/ -v
+
+      - name: Initialize Database Schema
+        run: |
+          mysql -h 127.0.0.1 -u root -proot < ./sql/01_create_db.sql
+          mysql -h 127.0.0.1 -u root -proot retail_dwh < ./sql/02_create_tables.sql
+          mysql -h 127.0.0.1 -u root -proot retail_dwh < ./sql/03_create_procedures.sql
+
+      - name: Run Great Expectations Setup
+        env:
+          AIRFLOW_CONN_MYSQL_DWH: "mysql://root:root@127.0.0.1:3306/retail_dwh"
+        run: |
+          python ./dags/setup_gx.py

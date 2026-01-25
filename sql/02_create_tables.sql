@@ -18,19 +18,19 @@ CREATE TABLE IF NOT EXISTS `stg_raw_sales` (
 
 CREATE TABLE IF NOT EXISTS `failed_sales` (
     `raw_id` INT AUTO_INCREMENT PRIMARY KEY,
-    `transaction_id` VARCHAR(100),
-    `transaction_date` VARCHAR(100),
-    `customer_id` VARCHAR(100),
-    `first_name` VARCHAR(100),
-    `city` VARCHAR(100),
-    `email` VARCHAR(100),
-    `product_id` VARCHAR(50),
+    `transaction_id` VARCHAR(255),
+    `transaction_date` VARCHAR(255),
+    `customer_id` VARCHAR(255),
+    `first_name` VARCHAR(255),
+    `city` VARCHAR(255),
+    `email` VARCHAR(255),
+    `product_id` VARCHAR(255),
     `product_name` VARCHAR(255),
-    `product_category` VARCHAR(100),
-    `price`VARCHAR(100),
-    `quantity` VARCHAR(100),
-    `load_timestamp` VARCHAR(100),
-    `rejection_reason` VARCHAR(100)
+    `product_category` VARCHAR(255),
+    `price`VARCHAR(255),
+    `quantity` VARCHAR(255),
+    `load_timestamp` VARCHAR(255),
+    `rejection_reason` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `dim_customer` (
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `dim_product` (
     `product_sk` INT AUTO_INCREMENT PRIMARY KEY,
     `product_id` VARCHAR(50) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
-    `price` DECIMAL(10, 2) NOT NULL,
+    `price` DECIMAL(10, 2) NOT NULL CHECK(`price` >= 0.01),
     `category` VARCHAR(100) NOT NULL,
     `start_date` DATETIME NOT NULL,
     `end_date` DATETIME DEFAULT NULL,
@@ -59,12 +59,12 @@ CREATE TABLE IF NOT EXISTS `dim_product` (
 
 CREATE TABLE IF NOT EXISTS `fact_sales` (
     `sale_id` INT AUTO_INCREMENT PRIMARY KEY,
-    `transaction_id` VARCHAR(50) NOT NULL,
+    `transaction_id` VARCHAR(50) NOT NULL UNIQUE,
     `customer_sk` INT NOT NULL,
     `product_sk` INT NOT NULL,
     `sale_date` DATE NOT NULL,
-    `amount` DECIMAL(10, 2) NOT NULL,
-    `quantity` INT NOT NULL,
+    `amount` DECIMAL(10, 2) NOT NULL CHECK(`amount` >= 0.01),
+    `quantity` INT NOT NULL CHECK(`quantity` > 0),
     `loaded_at` DATETIME NOT NULL,
     FOREIGN KEY (`customer_sk`) REFERENCES `dim_customer`(`customer_sk`) ON DELETE RESTRICT ON UPDATE CASCADE,
     FOREIGN KEY (`product_sk`) REFERENCES `dim_product`(`product_sk`) ON DELETE RESTRICT ON UPDATE CASCADE,

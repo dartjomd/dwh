@@ -1,3 +1,17 @@
-FROM apache/airflow:2.7.1
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+FROM apache/airflow:2.10.0-python3.11
+
+USER root
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       gcc \
+       python3-dev \
+       default-libmysqlclient-dev \
+       pkg-config \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+USER airflow
+
+COPY requirements/local.txt ./local.txt
+RUN pip install --no-cache-dir -r local.txt

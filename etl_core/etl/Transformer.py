@@ -37,7 +37,7 @@ class Transformer:
         duplicate_mask = df.duplicated(subset=["transaction_id"], keep="last")
         if duplicate_mask.any():
             duplicated_df = df[duplicate_mask].copy()
-            duplicated_df["rejection_reason"] = f"duplicated transaction_id"
+            duplicated_df["rejection_reason"] = "duplicated transaction_id"
             all_failed_list.append(duplicated_df)
             df = df[~duplicate_mask]
 
@@ -61,5 +61,8 @@ class Transformer:
 
         # change date type after all potential error records have been dropped
         df["transaction_date"] = df["transaction_date"].dt.strftime("%Y-%m-%d")
+
+        # quantity as int
+        df["quantity"] = df["quantity"].astype(int)
 
         return df, failed_df
