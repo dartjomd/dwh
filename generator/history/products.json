@@ -3,13 +3,13 @@
         "product_id": "PROD-2393",
         "product_name": "Production Pro",
         "product_category": "Electronics",
-        "price": 322.02
+        "price": 32.59
     },
     "PROD-8765": {
         "product_id": "PROD-8765",
         "product_name": "Through Pro",
         "product_category": "Clothing",
-        "price": 241.27
+        "price": 308.58
     },
     "PROD-7466": {
         "product_id": "PROD-7466",
@@ -21,12 +21,12 @@
         "product_id": "PROD-9886",
         "product_name": "Court Lite",
         "product_category": "Books",
-        "price": 150.66
+        "price": 405.47
     },
     "PROD-2682": {
         "product_id": "PROD-2682",
         "product_name": "Right Pro",
         "product_category": "Clothing",
-        "price": 188.48
+        "price": 317.13
     }
 }
