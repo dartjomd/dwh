@@ -69,7 +69,7 @@ The final data is surfaced in **Metabase**, providing real-time visibility into 
 ### **Local Setup**
 ```bash
 # Clone the repository
-git clone [https://github.com/dartjomd/dwh.git](https://github.com/dartjomd/dwh.git)
+git clone https://github.com/dartjomd/dwh.git
 
 # Launch the platform
 docker-compose up -d
